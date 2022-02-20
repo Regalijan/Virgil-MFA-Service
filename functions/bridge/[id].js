@@ -7,7 +7,7 @@ export async function onRequestGet(context) {
       },
       status: 401,
     });
-  const oauthData = await DATA.get(context.env.id);
+  const oauthData = await DATA.get(context.params.id);
   if (!oauthData)
     return new Response('{"error":"No data for user"}', {
       headers: {
