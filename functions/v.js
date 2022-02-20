@@ -5,21 +5,29 @@ export async function onRequestGet(context) {
   const { hostname, protocol } = new URL(context.request.url);
   if (!code)
     return Response.redirect(
-      `https://discord.com/api/oauth2/authorize?client_id=${context.env.CLIENT_ID}&redirect_uri=${
+      `https://discord.com/api/oauth2/authorize?client_id=${
+        context.env.CLIENT_ID
+      }&redirect_uri=${
         context.env.API_URL
           ? encodeURIComponent(context.env.API_URL)
           : "https%3A%2F%2Fmfa.virgil.gg%2Fv"
       }&response_type=code&scope=identify`,
       307
     );
-  const basic_token = `Basic ${btoa(`${context.env.CLIENT_ID}:${context.env.CLIENT_SECRET}`)}`;
+  const basic_token = `Basic ${btoa(
+    `${context.env.CLIENT_ID}:${context.env.CLIENT_SECRET}`
+  )}`;
   const oauthDataReq = await fetch("https://discord.com/api/oauth2/token", {
     headers: {
       authorization: basic_token,
       "content-type": "application/x-www-form-urlencoded",
     },
     method: "POST",
-    body: `grant_type=authorization_code&code=${code}&redirect_url=https%3A%2F%2Fmfa.virgil.gg%2Fv`,
+    body: `grant_type=authorization_code&code=${code}&redirect_uri=${
+      context.env.API_URL
+        ? encodeURIComponent(context.env.API_URL)
+        : "https%3A%2F%2Fmfa.virgil.gg"
+    }%2Fv`,
   });
   if (!oauthDataReq.ok)
     return Response.redirect(`${protocol}//${hostname}/fail`, 307);
