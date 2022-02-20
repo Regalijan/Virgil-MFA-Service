@@ -13,29 +13,29 @@ export async function onRequestGet(context) {
       }&response_type=code&scope=identify`,
       307
     );
-  const oauthDataReq = await fetch("https://discord.com/api/v10/oauth2/token", {
+  const oauthDataReq = await fetch("https://discord.com/api/oauth2/token", {
     headers: {
-      authorization: `Basic ${btoa(CLIENT_ID + ":" + CLIENT_SECRET)}`,
+      authorization: `Basic ${btoa(context.env.CLIENT_ID + ":" + context.CLIENT_SECRET)}`,
       "content-type": "application/x-www-form-urlencoded",
     },
     method: "POST",
     body: `grant_type=authorization_code&code=${code}&redirect_url=https%3A%2F%2Fmfa.virgil.gg%2Fv`,
   });
   if (!oauthDataReq.ok)
-    return Response.redirect(`${protocol}//${hostname}/done`, 307);
+    return Response.redirect(`${protocol}//${hostname}/fail`, 307);
   const oauthData = await oauthDataReq.json();
   oauthDataReq.expires_at = oauthData.expires_in * 1000 + Date.now();
   delete oauthData.expires_in;
-  const userInfoReq = await fetch("https://discord.com/api/v10/users/@me", {
+  const userInfoReq = await fetch("https://discord.com/api/users/@me", {
     headers: {
       authorization: `${oauthData.token_type} ${oauthData.access_token}`,
     },
   });
   if (!userInfoReq.ok) {
-    await fetch("https://discord.com/api/v10/oauth2/token/revoke", {
+    await fetch("https://discord.com/api/oauth2/token/revoke", {
       // See https://datatracker.ietf.org/doc/html/rfc7009#section-2.1
       headers: {
-        authorization: `Basic ${btoa(CLIENT_ID + ":" + CLIENT_SECRET)}`,
+        authorization: `Basic ${btoa(context.env.CLIENT_ID + ":" + context.env.CLIENT_SECRET)}`,
         "content-type": "application/x-www-form-urlencoded",
       },
       method: "POST",
