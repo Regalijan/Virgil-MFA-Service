@@ -32,7 +32,7 @@ export async function onRequestGet(context) {
   if (!oauthDataReq.ok)
     return Response.redirect(`${protocol}//${hostname}/fail`, 307);
   const oauthData = await oauthDataReq.json();
-  oauthDataReq.expires_at = oauthData.expires_in * 1000 + Date.now();
+  oauthData.expires_at = oauthData.expires_in * 1000 + Date.now();
   delete oauthData.expires_in;
   const userInfoReq = await fetch("https://discord.com/api/users/@me", {
     headers: {
