@@ -1,12 +1,11 @@
 export async function onRequestGet(context) {
   // Set the CLIENT_ID, CLIENT_SECRET, and DATA environment variables in the Cloudflare dashboard
   // Set API_URL as well for self-hosting
-  const { CLIENT_ID, CLIENT_SECRET, DATA } = context.env;
   const code = new URL(context.request.url).searchParams.get("code");
   const { hostname, protocol } = new URL(context.request.url);
   if (!code)
     return Response.redirect(
-      `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${
+      `https://discord.com/api/oauth2/authorize?client_id=${context.env.CLIENT_ID}&redirect_uri=${
         context.env.API_URL
           ? encodeURIComponent(context.env.API_URL)
           : "https%3A%2F%2Fmfa.virgil.gg%2Fv"
@@ -44,6 +43,6 @@ export async function onRequestGet(context) {
     return Response.redirect(`${protocol}//${hostname}/fail`, 307);
   }
   const userInfo = await userInfoReq.json();
-  await DATA.put(userInfo.id, oauthData);
+  await DATA.put(userInfo.id, JSON.stringify(oauthData));
   return Response.redirect(`${protocol}//${hostname}/done`, 307);
 }
