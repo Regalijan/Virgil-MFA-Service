@@ -12,9 +12,10 @@ export async function onRequestGet(context) {
       }&response_type=code&scope=identify`,
       307
     );
+  const basic_token = `Basic ${btoa(`${context.env.CLIENT_ID}:${context.env.CLIENT_SECRET}`)}`;
   const oauthDataReq = await fetch("https://discord.com/api/oauth2/token", {
     headers: {
-      authorization: `Basic ${btoa(context.env.CLIENT_ID + ":" + context.CLIENT_SECRET)}`,
+      authorization: basic_token,
       "content-type": "application/x-www-form-urlencoded",
     },
     method: "POST",
@@ -34,7 +35,7 @@ export async function onRequestGet(context) {
     await fetch("https://discord.com/api/oauth2/token/revoke", {
       // See https://datatracker.ietf.org/doc/html/rfc7009#section-2.1
       headers: {
-        authorization: `Basic ${btoa(context.env.CLIENT_ID + ":" + context.env.CLIENT_SECRET)}`,
+        authorization: basic_token,
         "content-type": "application/x-www-form-urlencoded",
       },
       method: "POST",
