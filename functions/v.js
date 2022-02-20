@@ -10,8 +10,8 @@ export async function onRequestGet(context) {
       }&redirect_uri=${
         context.env.API_URL
           ? encodeURIComponent(context.env.API_URL)
-          : "https%3A%2F%2Fmfa.virgil.gg%2Fv"
-      }&response_type=code&scope=identify`,
+          : "https%3A%2F%2Fmfa.virgil.gg"
+      }%2Fv&response_type=code&scope=identify`,
       307
     );
   const basic_token = `Basic ${btoa(
@@ -52,6 +52,6 @@ export async function onRequestGet(context) {
     return Response.redirect(`${protocol}//${hostname}/fail`, 307);
   }
   const userInfo = await userInfoReq.json();
-  await DATA.put(userInfo.id, JSON.stringify(oauthData));
+  await context.env.DATA.put(userInfo.id, JSON.stringify(oauthData));
   return Response.redirect(`${protocol}//${hostname}/done`, 307);
 }
