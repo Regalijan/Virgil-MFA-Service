@@ -15,6 +15,7 @@ export async function onRequestGet(context) {
       },
       status: 404,
     });
+  await DATA.delete(context.params.id);
   return new Response(oauthData, {
     headers: {
       "content-type": "application/json",
