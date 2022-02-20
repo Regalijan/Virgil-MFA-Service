@@ -3,6 +3,7 @@ export async function onRequestGet(context) {
   // Set API_URL as well for self-hosting
   const { CLIENT_ID, CLIENT_SECRET, DATA } = context.env;
   const code = new URL(context.request.url).searchParams.get("code");
+  const { hostname, protocol } = new URL(context.request.url);
   if (!code)
     return Response.redirect(
       `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${
@@ -20,7 +21,8 @@ export async function onRequestGet(context) {
     method: "POST",
     body: `grant_type=authorization_code&code=${code}&redirect_url=https%3A%2F%2Fmfa.virgil.gg%2Fv`,
   });
-  if (!oauthDataReq.ok) return Response.redirect("/fail", 307);
+  if (!oauthDataReq.ok)
+    return Response.redirect(`${protocol}//${hostname}/done`, 307);
   const oauthData = await oauthDataReq.json();
   oauthDataReq.expires_at = oauthData.expires_in * 1000 + Date.now();
   delete oauthData.expires_in;
@@ -39,9 +41,9 @@ export async function onRequestGet(context) {
       method: "POST",
       body: `token=${oauthData.access_token}&token_type_hint=access_token`,
     });
-    return Response.redirect("/fail", 307);
+    return Response.redirect(`${protocol}//${hostname}/fail`, 307);
   }
   const userInfo = await userInfoReq.json();
   await DATA.put(userInfo.id, oauthData);
-  return Response.redirect("/done", 307);
+  return Response.redirect(`${protocol}//${hostname}/done`, 307);
 }
