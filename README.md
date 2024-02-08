@@ -1,6 +1,6 @@
 # Virgil MFA Service
 
-This service allows the [bot](https://github.com/Wolftallemo/Virgil) to validate and enforce a user's MFA (multifactor authentication) status
+This service allows the [bot](https://github.com/Regalijan/Virgil) to validate and enforce a user's MFA (multifactor authentication) status
 
 You must set the following environment variables:
 
